@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -23,8 +23,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     'phone',
     'action',
   ];
-  dataSource!: MatTableDataSource<any>;
-  selection: any = new SelectionModel(true, []);
+  dataSource: MatTableDataSource<any>=new MatTableDataSource();
+  selection: any = new SelectionModel<any>(true, []);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -34,27 +34,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(
     private _dialog: MatDialog,
     private _EmployeeService: EmployeeService,
-    private spinner:NgxSpinnerService
+    private spinner: NgxSpinnerService
   ) {}
-
-  openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-    const DialogRef = this._dialog.open(DeleteEmployeeComponent, {
-      width: '250px',
-      enterAnimationDuration,
-      exitAnimationDuration,
-    });
-    DialogRef.afterClosed().subscribe({
-      next: (val) => {
-        if (val) {
-          this.deleteSelectedEmployees()
-        }
-      },
-      error: console.log,
-      complete:() => {
-        this.selection.clear();
-      },
-    });
-  }
 
   isAllSelected() {
     const numSelected = this.selection.selected.length;
@@ -92,13 +73,13 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   GetEmployees() {
     this._EmployeeService.GetAllEmployees().subscribe({
-      next:(res) => {
-      this.dataSource = new MatTableDataSource(res);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      next: (res) => {
+        this.dataSource = new MatTableDataSource(res);
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
       },
-      complete:() => {
-          this.spinner.hide();
+      complete: () => {
+        this.spinner.hide();
       },
     });
   }
@@ -112,7 +93,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
       },
       error: console.log,
-      complete:() => {
+      complete: () => {
         this.selection.clear();
       },
     });
@@ -129,42 +110,70 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
       },
       error: console.log,
-      complete:() => {
+      complete: () => {
         this.selection.clear();
       },
     });
   }
 
-  // Deleteemployee(employeeId: number) {
-  //     this._EmployeeService.DeleteEmployee(employeeId).subscribe({
-  //       next: (res) => {
-  //         this.GetEmployees();
-  //       },
-  //       error: console.log,
-  //       complete:() => {
-  //         this.selection.clear();
-  //       },
-  //     });
-  // }
+  openDialog(
+    enterAnimationDuration: string = '0',
+    exitAnimationDuration: string = '0'
+  ): MatDialogRef<DeleteEmployeeComponent> {
+    const DialogRef = this._dialog.open(DeleteEmployeeComponent, {
+      width: '250px',
+      enterAnimationDuration,
+      exitAnimationDuration,
+    });
+    return DialogRef;
+  }
 
-  deleteSelectedEmployees()
-  {
-    const employees = this.selection.selected
-    const employeeIds: number[] = employees.map((employee:any) => employee.id);
+  Deleteemployee(employeeId: number) {
+    const DialogRef = this.openDialog();
+    DialogRef.afterClosed().subscribe({
+      next: (val) => {
+        if (val) {
+          this._EmployeeService.DeleteEmployee(employeeId).subscribe({
+            next: (res) => {
+              this.GetEmployees();
+            },
+            error: console.log,
+            complete: () => {
+              this.selection.clear();
+            },
+          });
+        }
+      },
+    });
+  }
+
+  deleteSelectedEmployees() {
+    console.log(this.selection.selected.length>0);
+
+    const employees = this.selection.selected;
+    const employeeIds: number[] = employees.map((employee: any) => employee.id);
     console.log(employeeIds);
 
-    this._EmployeeService.DeleteListOfEmployee(employeeIds).subscribe({
-        next: (res) => {
-          this.GetEmployees();
-        },
-        error: console.log,
-        complete:() => {
-          this.selection.clear();
-        },
-      });
+    const DialogRef = this.openDialog();
+    DialogRef.afterClosed().subscribe({
+      next: (val) => {
+        if (val) {
+          this._EmployeeService.DeleteListOfEmployee(employeeIds).subscribe({
+            next: (res) => {
+              this.GetEmployees();
+            },
+            error: console.log,
+            complete: () => {
+              this.selection.clear();
+            },
+          });
+        }
+      },
+    });
   }
 
   ngAfterViewInit() {
+    this.sort.disableClear = true;
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }

@@ -22,17 +22,17 @@ export class EmployeeService {
     return this.http.post("https://localhost:7185/api/Employee", employee)
   }
 
-  UpdateEmployee(employee:any)
+  UpdateEmployee(employee:any):Observable<any>
   {
     return this.http.put("https://localhost:7185/api/Employee", employee)
   }
 
-  DeleteEmployee(empId:number)
+  DeleteEmployee(empId:number):Observable<any>
   {
-    return this.http.delete("https://localhost:7185/api/EmployeeDeleteEmployee/?empId=" + empId)
+    return this.http.delete("https://localhost:7185/api/Employee/DeleteEmployee/?empId=" + empId)
   }
 
-  DeleteListOfEmployee(empIds:number[])
+  DeleteListOfEmployee(empIds:number[]):Observable<any>
   {
     return this.http.delete("https://localhost:7185/api/Employee/DeleteListOfEmployee", {body: empIds})
   }
