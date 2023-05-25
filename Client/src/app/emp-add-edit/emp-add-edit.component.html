@@ -1,0 +1,94 @@
+<div matDialogTitle>
+  <h1>{{ data ? "Edit Employee" : "Add Employee" }}</h1>
+</div>
+
+<form [formGroup]="EmployeeForm" (ngSubmit)="submitForm()">
+  <div mat-dialog-content>
+    <div class="row">
+      <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" />
+        <div
+          *ngIf="
+            EmployeeForm.controls['name'].touched &&
+            EmployeeForm.controls['name'].invalid
+          "
+          class="text-danger"
+        >
+          <p *ngIf="EmployeeForm.controls['name'].errors?.['required']">
+            Name Required
+          </p>
+          <p *ngIf="EmployeeForm.controls['name'].errors?.['minlength']">
+            Name min length shoud be 3
+          </p>
+          <p *ngIf="EmployeeForm.controls['name'].errors?.['maxlength']">
+            Name max length shoud be 10
+          </p>
+        </div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" />
+        <div
+        *ngIf="
+        EmployeeForm.controls['email'].touched &&
+        EmployeeForm.controls['email'].invalid
+        "
+        class="text-danger"
+      >
+        <p *ngIf="EmployeeForm.controls['email'].errors?.['required']">
+          Email Required
+        </p>
+        <p *ngIf="EmployeeForm.controls['email'].errors?.['pattern']">
+          Email shoud be like email@example.com
+        </p>
+      </div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Mobile</mat-label>
+        <input matInput formControlName="mobile" />
+        <div
+          *ngIf="
+            EmployeeForm.controls['mobile'].touched &&
+            EmployeeForm.controls['mobile'].invalid
+          "
+          class="text-danger"
+        >
+          <p *ngIf="EmployeeForm.controls['mobile'].errors?.['required']">
+            phone Required
+          </p>
+          <p *ngIf="EmployeeForm.controls['mobile'].errors?.['pattern']">
+            phone shoud be 11 number only and should begin with 011 , 012 or 010
+          </p>
+        </div>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Address</mat-label>
+        <input matInput formControlName="address" />
+        <div
+        *ngIf="
+        EmployeeForm.controls['address'].touched &&
+        EmployeeForm.controls['address'].invalid
+        "
+        class="text-danger"
+      >
+        <p *ngIf="EmployeeForm.controls['address'].errors?.['required']">
+          address Required
+        </p>
+      </div>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-raised-button type="button" [mat-dialog-close]="false">
+      Cancel
+    </button>
+    <button mat-raised-button [disabled]="EmployeeForm.invalid" id="SubmitButton" type="submit">
+      {{ data ? "Save" : "Add" }}
+    </button>
+  </div>
+</form>
