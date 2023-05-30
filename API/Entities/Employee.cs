@@ -15,5 +15,9 @@ namespace API.Entities
         public string Mobile { get; set; }
         [Required]
         public string Address { get; set; }
+        [Required]
+        public string FileName { get; set; }
+
+
     }
 }

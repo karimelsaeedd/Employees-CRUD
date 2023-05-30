@@ -80,6 +80,13 @@
         </p>
       </div>
       </mat-form-field>
+
+      <div>
+        <label for="file">File:</label>
+        <input type="file" id="file" (change)="onFileSelected($event)" formControlName="file" accept=".txt,.pdf">
+        <div>{{ selectedFile ? selectedFile.name : '' }}</div>
+      </div>
+
     </div>
   </div>
 

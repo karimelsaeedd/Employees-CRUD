@@ -21,10 +21,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     'email',
     'address',
     'phone',
+    'file',
     'action',
   ];
   dataSource: MatTableDataSource<any>=new MatTableDataSource();
   selection: any = new SelectionModel<any>(true, []);
+  searchFilter='';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -64,6 +66,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
+    this.searchFilter = filterValue;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
@@ -74,6 +77,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   GetEmployees() {
     this._EmployeeService.GetAllEmployees().subscribe({
       next: (res) => {
+        console.log(res);
+
         this.dataSource = new MatTableDataSource(res);
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
@@ -84,8 +89,43 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
+  DownloadFile(emp:any)
+  {
+    console.log(emp);
+
+    this._EmployeeService.DownloadEmployeeFile(emp.fileName)
+    .subscribe({
+      next:(response) => {
+        console.log("RESPONSE",response);
+
+        // Create a blob object from the response
+    // const blob = new Blob([response], { type: 'application/octet-stream' });
+
+    // // Create a temporary URL for the blob object
+    // const blobUrl = window.URL.createObjectURL(blob);
+    // console.log(blobUrl)
+
+    // // Open the file in a new browser tab
+    // window.open(blobUrl);
+
+    // // Optionally, you can revoke the URL after the file is opened
+    // // to free up memory resources
+    // // window.URL.revokeObjectURL(url);
+      const link = document.createElement('a');
+      link.href = "https://localhost:7185/api/Employee/DownloadFile/" + emp.fileName;
+      link.target = '_blank'; // Open in a new tab or window
+
+      // Trigger the download by programmatically clicking the link
+      link.click();
+
+      }
+    });
+    }
+
   openAddEditEmpForm() {
-    const DialogRef = this._dialog.open(EmpAddEditComponent);
+    const DialogRef = this._dialog.open(EmpAddEditComponent, {
+      width: '40%',
+    });
     DialogRef.afterClosed().subscribe({
       next: (val) => {
         if (val) {
@@ -101,12 +141,19 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   openEditEmpForm(data: any) {
     const DialogRef = this._dialog.open(EmpAddEditComponent, {
+      width: '40%',
       data,
     });
     DialogRef.afterClosed().subscribe({
       next: (val) => {
         if (val) {
           this.GetEmployees();
+          this.dataSource.filter = this.searchFilter.trim().toLowerCase();
+          console.log("this.dataSource.filter", this.dataSource.filter);
+
+          if (this.dataSource.paginator) {
+            this.dataSource.paginator.firstPage();
+          }
         }
       },
       error: console.log,
@@ -136,6 +183,12 @@ export class AppComponent implements OnInit, AfterViewInit {
           this._EmployeeService.DeleteEmployee(employeeId).subscribe({
             next: (res) => {
               this.GetEmployees();
+              this.dataSource.filter = this.searchFilter.trim().toLowerCase();
+              console.log("this.dataSource.filter", this.dataSource.filter);
+
+              if (this.dataSource.paginator) {
+                this.dataSource.paginator.firstPage();
+              }
             },
             error: console.log,
             complete: () => {

@@ -9,5 +9,6 @@ namespace API.Data
         { 
         }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<FTPSetting> fTPSettings { get; set; }
     }
 }

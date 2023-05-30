@@ -22,9 +22,9 @@ export class EmployeeService {
     return this.http.post("https://localhost:7185/api/Employee", employee)
   }
 
-  UpdateEmployee(employee:any):Observable<any>
+  UpdateEmployee(empId:number ,employee:any):Observable<any>
   {
-    return this.http.put("https://localhost:7185/api/Employee", employee)
+    return this.http.put("https://localhost:7185/api/Employee?empId=" + empId, employee)
   }
 
   DeleteEmployee(empId:number):Observable<any>
@@ -36,4 +36,21 @@ export class EmployeeService {
   {
     return this.http.delete("https://localhost:7185/api/Employee/DeleteListOfEmployee", {body: empIds})
   }
+
+  // DownloadEmployeeFile(empId:number):Observable<any>
+  // {
+  //   return this.http.get('https://localhost:7185/api/Employee/DownloadFile', { params: { empId: empId.toString() }, responseType: 'arraybuffer' })
+  // }
+
+  DownloadEmployeeFile(fileName:string):Observable<any>
+  {
+    return this.http.get('https://localhost:7185/api/Employee/DownloadFile/' + fileName, { responseType: 'blob' })
+  }
+
+  downloadEmployeeFile(employeeId: number): Observable<Blob> {
+    return this.http.get(`https://localhost:7185/api//Employees/${employeeId}/file`, {
+      responseType: 'blob'
+    });
+  }
+
 }
